@@ -205,3 +205,28 @@ func (r *ResponseUserOfGroup) IsDeleted() bool {
 type ResponseRemoveUser struct {
 	Response int `json:"response"`
 }
+
+// ResponseGetUploadServer - ???
+type ResponseGetUploadServer struct {
+	Response struct {
+		UploadURL string `json:"upload_url"`
+		AlbumID   int    `json:"album_id"`
+		UserID    int    `json:"user_id"`
+	} `json:"response"`
+}
+
+// ResponseSavePhoto - ???
+type ResponseSavePhoto struct {
+	Response struct {
+		UploadURL string `json:"upload_url"`
+		AlbumID   int    `json:"album_id"`
+		UserID    int    `json:"user_id"`
+	} `json:"response"`
+}
+
+// ResponseFileUploadRequest - ???
+type ResponseFileUploadRequest struct {
+	Server int    `json:"server"`
+	Photo  string `json:"photo"`
+	Hash   string `json:"hash"`
+}

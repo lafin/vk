@@ -201,3 +201,31 @@ func RemoveUserFromGroup(groupID int, userID int) (*ResponseRemoveUser, error) {
 	}
 	return &status, nil
 }
+
+// GetUploadServer - ???
+func GetUploadServer(groupID int) (*ResponseGetUploadServer, error) {
+	data, err := httpclient.GetData(APIURL + "/method/photos.getWallUploadServer?group_id=" + strconv.Itoa(groupID) + "&access_token=" + accessToken + "&v=" + APIVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	var server ResponseGetUploadServer
+	if err := json.Unmarshal(data, &server); err != nil {
+		return nil, err
+	}
+	return &server, nil
+}
+
+// SavePhoto - ???
+func SavePhoto(server int, photo, hash string) (*ResponseSavePhoto, error) {
+	data, err := httpclient.GetData(APIURL + "/method/photos.saveWallPhoto?server=" + strconv.Itoa(server) + "&photo=" + photo + "&hash=" + hash + "&access_token=" + accessToken + "&v=" + APIVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ResponseSavePhoto
+	if err := json.Unmarshal(data, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
