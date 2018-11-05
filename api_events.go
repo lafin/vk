@@ -206,7 +206,7 @@ type ResponseRemoveUser struct {
 	Response int `json:"response"`
 }
 
-// ResponseGetUploadServer - ???
+// ResponseGetUploadServer - struct of response the upload server request
 type ResponseGetUploadServer struct {
 	Response struct {
 		UploadURL string `json:"upload_url"`
@@ -215,16 +215,32 @@ type ResponseGetUploadServer struct {
 	} `json:"response"`
 }
 
-// ResponseSavePhoto - ???
+// ResponseSavePhoto - struct of response the save photo request
 type ResponseSavePhoto struct {
-	Response struct {
-		UploadURL string `json:"upload_url"`
+	Response []struct {
+		ID        int    `json:"id"`
 		AlbumID   int    `json:"album_id"`
-		UserID    int    `json:"user_id"`
+		OwnerID   int    `json:"owner_id"`
+		Photo75   string `json:"photo_75"`
+		Photo130  string `json:"photo_130"`
+		Photo604  string `json:"photo_604"`
+		Width     int    `json:"width"`
+		Height    int    `json:"height"`
+		Text      string `json:"text"`
+		Date      int    `json:"date"`
+		AccessKey string `json:"access_key"`
 	} `json:"response"`
+	Error struct {
+		ErrorCode     int    `json:"error_code"`
+		ErrorMsg      string `json:"error_msg"`
+		RequestParams []struct {
+			Key   string `json:"key"`
+			Value string `json:"value"`
+		} `json:"request_params"`
+	} `json:"error"`
 }
 
-// ResponseFileUploadRequest - ???
+// ResponseFileUploadRequest - struct of response the file upload request
 type ResponseFileUploadRequest struct {
 	Server int    `json:"server"`
 	Photo  string `json:"photo"`

@@ -202,7 +202,7 @@ func RemoveUserFromGroup(groupID int, userID int) (*ResponseRemoveUser, error) {
 	return &status, nil
 }
 
-// GetUploadServer - ???
+// GetUploadServer - get upload server
 func GetUploadServer(groupID int) (*ResponseGetUploadServer, error) {
 	data, err := httpclient.GetData(APIURL + "/method/photos.getWallUploadServer?group_id=" + strconv.Itoa(groupID) + "&access_token=" + accessToken + "&v=" + APIVersion)
 	if err != nil {
@@ -216,9 +216,9 @@ func GetUploadServer(groupID int) (*ResponseGetUploadServer, error) {
 	return &server, nil
 }
 
-// SavePhoto - ???
-func SavePhoto(server int, photo, hash string) (*ResponseSavePhoto, error) {
-	data, err := httpclient.GetData(APIURL + "/method/photos.saveWallPhoto?server=" + strconv.Itoa(server) + "&photo=" + photo + "&hash=" + hash + "&access_token=" + accessToken + "&v=" + APIVersion)
+// SavePhoto - save photo to upload server
+func SavePhoto(groupID, server int, photo, hash string) (*ResponseSavePhoto, error) {
+	data, err := httpclient.GetData(APIURL + "/method/photos.saveWallPhoto?group_id=" + strconv.Itoa(groupID) + "&server=" + strconv.Itoa(server) + "&photo=" + url.QueryEscape(photo) + "&hash=" + hash + "&access_token=" + accessToken + "&v=" + APIVersion)
 	if err != nil {
 		return nil, err
 	}
