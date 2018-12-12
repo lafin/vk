@@ -224,6 +224,9 @@ type ResponseSavePhoto struct {
 		Photo75   string `json:"photo_75"`
 		Photo130  string `json:"photo_130"`
 		Photo604  string `json:"photo_604"`
+		Photo807  string `json:"photo_807"`
+		Photo1280 string `json:"photo_1280"`
+		Photo2560 string `json:"photo_2560"`
 		Width     int    `json:"width"`
 		Height    int    `json:"height"`
 		Text      string `json:"text"`
