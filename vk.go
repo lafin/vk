@@ -1,3 +1,4 @@
+// Package vk handle work with vk
 package vk
 
 import (
@@ -50,8 +51,8 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 			return "", err
 		}
 
-		r := regexp.MustCompile("<form method=\"post\" action=\"(.*?)\">")
-		match := r.FindStringSubmatch(string(data))
+		r = regexp.MustCompile("<form method=\"post\" action=\"(.*?)\">")
+		match = r.FindStringSubmatch(string(data))
 		response, err = client.PostForm(match[1], url.Values{})
 		if err != nil {
 			return "", err
@@ -180,7 +181,7 @@ func (p *Post) GetUniqueFiles() ([][]byte, []string) {
 }
 
 // GetListUsersofGroup - get list deactivated users
-func GetListUsersofGroup(groupID int, offset int, count int) (*ResponseUsersOfGroup, error) {
+func GetListUsersofGroup(groupID, offset, count int) (*ResponseUsersOfGroup, error) {
 	data, err := httpclient.GetData(APIURL + "/method/groups.getMembers?group_id=" + strconv.Itoa(groupID) + "&offset=" + strconv.Itoa(offset) + "&count=" + strconv.Itoa(count) + "&fields=last_seen&access_token=" + accessToken + "&v=" + APIVersion)
 	if err != nil {
 		return nil, err
@@ -194,7 +195,7 @@ func GetListUsersofGroup(groupID int, offset int, count int) (*ResponseUsersOfGr
 }
 
 // RemoveUserFromGroup - remove user from group
-func RemoveUserFromGroup(groupID int, userID int) (*ResponseRemoveUser, error) {
+func RemoveUserFromGroup(groupID, userID int) (*ResponseRemoveUser, error) {
 	data, err := httpclient.GetData(APIURL + "/method/groups.removeUser?group_id=" + strconv.Itoa(groupID) + "&user_id=" + strconv.Itoa(userID) + "&access_token=" + accessToken + "&v=" + APIVersion)
 	if err != nil {
 		return nil, err
