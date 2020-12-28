@@ -19,7 +19,6 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 		return accessToken, nil
 	}
 
-	client := http.Client()
 	data, err := http.Get(AuthURL+"/authorize?client_id="+clientID+"&redirect_uri=https://oauth.vk.com/blank.html&display=mobile&scope="+Permissions+"&response_type=token&v="+APIVersion, nil)
 	if err != nil {
 		return "", err
@@ -39,6 +38,7 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 	formData.Add("email", email)
 	formData.Add("pass", pass)
 
+	client := http.Client()
 	response, err := client.PostForm(urlStr, formData)
 	if err != nil {
 		return "", err
