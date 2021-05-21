@@ -46,7 +46,7 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 
 	r = regexp.MustCompile("__q_hash=.*?")
 	if r.MatchString(response.Request.URL.String()) {
-		data, err := http.Get(response.Request.URL.String(), nil)
+		data, err = http.Get(response.Request.URL.String(), nil)
 		if err != nil {
 			return "", err
 		}
@@ -59,10 +59,27 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 		}
 	}
 
-	r = regexp.MustCompile("access_token=(.*?)&")
-	match = r.FindStringSubmatch(response.Request.URL.String())
-	if len(match) > 0 {
-		accessToken = match[1]
+	parsedRedirectURL, err := url.Parse(response.Request.URL.String())
+	if err != nil {
+		return "", err
+	}
+	if parsedRedirectURL.Query().Get("authorize_url") == "" {
+		return "", errors.New("can't find the authorize_url")
+	}
+	authorizeURL, err := url.PathUnescape(parsedRedirectURL.Query().Get("authorize_url"))
+	if err != nil {
+		return "", err
+	}
+	parsedAuthorizeURL, err := url.Parse(authorizeURL)
+	if err != nil {
+		return "", err
+	}
+	parsedAuthorizeURLFragment, err := url.ParseQuery(parsedAuthorizeURL.Fragment)
+	if err != nil {
+		return "", err
+	}
+	if parsedAuthorizeURLFragment.Get("access_token") != "" {
+		accessToken = parsedAuthorizeURLFragment.Get("access_token")
 		return accessToken, nil
 	}
 
