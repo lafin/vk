@@ -4,6 +4,8 @@ package vk
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -19,7 +21,7 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 		return accessToken, nil
 	}
 
-	data, err := http.Get(AuthURL+"/authorize?client_id="+clientID+"&redirect_uri=https://oauth.vk.com/blank.html&display=mobile&scope="+Permissions+"&response_type=token&v="+APIVersion, nil)
+	data, err := http.Get(fmt.Sprintf("%s/authorize?client_id=%s&redirect_uri=https://oauth.vk.com/blank.html&display=mobile&scope=%s&response_type=token&v=%s", AuthURL, clientID, Permissions, APIVersion), nil)
 	if err != nil {
 		return "", err
 	}
@@ -39,27 +41,33 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 	formData.Add("pass", pass)
 
 	client := http.Client()
-	response, err := client.PostForm(urlStr, formData)
+	res, err := client.PostForm(urlStr, formData)
 	if err != nil {
 		return "", err
 	}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+	if res.StatusCode != 200 {
+		return "", fmt.Errorf("wrong response code: %d with response %s", res.StatusCode, body)
+	}
 
 	r = regexp.MustCompile("__q_hash=.*?")
-	if r.MatchString(response.Request.URL.String()) {
-		data, err = http.Get(response.Request.URL.String(), nil)
+	if r.MatchString(res.Request.URL.String()) {
+		data, err = http.Get(res.Request.URL.String(), nil)
 		if err != nil {
 			return "", err
 		}
 
 		r = regexp.MustCompile("<form method=\"post\" action=\"(.*?)\">")
 		match = r.FindStringSubmatch(string(data))
-		response, err = client.PostForm(match[1], url.Values{})
+		res, err = client.PostForm(match[1], url.Values{})
 		if err != nil {
 			return "", err
 		}
 	}
-
-	parsedRedirectURL, err := url.Parse(response.Request.URL.String())
+	parsedRedirectURL, err := url.Parse(res.Request.URL.String())
 	if err != nil {
 		return "", err
 	}
@@ -88,7 +96,7 @@ func GetAccessToken(clientID, email, pass string) (string, error) {
 
 // GetPosts - get list of posts
 func GetPosts(groupID, count string) (*Posts, error) {
-	data, err := http.Get(APIURL+"/method/wall.get?owner_id=-"+groupID+"&count="+count+"&filter=all&access_token="+accessToken+"&v="+APIVersion, nil)
+	data, err := http.Get(fmt.Sprintf("%s/method/wall.get?owner_id=-%s&count=%s&filter=all&access_token=%s&v=%s", APIURL, groupID, count, accessToken, APIVersion), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +110,7 @@ func GetPosts(groupID, count string) (*Posts, error) {
 
 // GetGroupsInfo - get group info
 func GetGroupsInfo(groupIDs, fields string) (*Groups, error) {
-	data, err := http.Get(APIURL+"/method/groups.getById?group_ids="+groupIDs+"&fields="+fields+"&access_token="+accessToken+"&v="+APIVersion, nil)
+	data, err := http.Get(fmt.Sprintf("%s/method/groups.getById?group_ids=%s&fields=%s&access_token=%s&v=%s", APIURL, groupIDs, fields, accessToken, APIVersion), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +124,7 @@ func GetGroupsInfo(groupIDs, fields string) (*Groups, error) {
 
 // DoRepost - do repost the post
 func DoRepost(object string, groupID int, message string) (*ResponseRepost, error) {
-	data, err := http.Get(APIURL+"/method/wall.repost?object="+object+"&group_id="+strconv.Itoa(groupID)+"&message="+message+"&access_token="+accessToken+"&v="+APIVersion, nil)
+	data, err := http.Get(fmt.Sprintf("%s/method/wall.repost?object=%s&group_id=%s&message=%s&access_token=%s&v=%s", APIURL, object, strconv.Itoa(groupID), message, accessToken, APIVersion), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +138,7 @@ func DoRepost(object string, groupID int, message string) (*ResponseRepost, erro
 
 // DoPost - do post the post
 func DoPost(groupID int, attachments, message string) (*ResponsePost, error) {
-	data, err := http.Get(APIURL+"/method/wall.post?owner_id=-"+strconv.Itoa(groupID)+"&from_group=1&mark_as_ads=0&attachments="+attachments+"&message="+message+"&access_token="+accessToken+"&v="+APIVersion, nil)
+	data, err := http.Get(fmt.Sprintf("%s/method/wall.post?owner_id=-%s&from_group=1&mark_as_ads=0&attachments=%s&message=%s&access_token=%s&v=%s", APIURL, strconv.Itoa(groupID), attachments, message, accessToken, APIVersion), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +207,7 @@ func (p *Post) GetUniqueFiles() ([][]byte, []string) {
 
 // GetListUsersofGroup - get list deactivated users
 func GetListUsersofGroup(groupID, offset, count int) (*ResponseUsersOfGroup, error) {
-	data, err := http.Get(APIURL+"/method/groups.getMembers?group_id="+strconv.Itoa(groupID)+"&offset="+strconv.Itoa(offset)+"&count="+strconv.Itoa(count)+"&fields=last_seen&access_token="+accessToken+"&v="+APIVersion, nil)
+	data, err := http.Get(fmt.Sprintf("%s/method/groups.getMembers?group_id=%s&offset=%s&count=%s&fields=last_seen&access_token=%s&v=%s", APIURL, strconv.Itoa(groupID), strconv.Itoa(offset), strconv.Itoa(count), accessToken, APIVersion), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +221,7 @@ func GetListUsersofGroup(groupID, offset, count int) (*ResponseUsersOfGroup, err
 
 // RemoveUserFromGroup - remove user from group
 func RemoveUserFromGroup(groupID, userID int) (*ResponseRemoveUser, error) {
-	data, err := http.Get(APIURL+"/method/groups.removeUser?group_id="+strconv.Itoa(groupID)+"&user_id="+strconv.Itoa(userID)+"&access_token="+accessToken+"&v="+APIVersion, nil)
+	data, err := http.Get(fmt.Sprintf("%s/method/groups.removeUser?group_id=%s&user_id=%s&access_token=%s&v=%s", APIURL, strconv.Itoa(groupID), strconv.Itoa(userID), accessToken, APIVersion), nil)
 	if err != nil {
 		return nil, err
 	}
