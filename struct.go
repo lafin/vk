@@ -69,7 +69,7 @@ type Post struct {
 		Album struct {
 			Created     int    `json:"created"`
 			Description string `json:"description"`
-			ID          string `json:"id"`
+			ID          int    `json:"id"`
 			OwnerID     int    `json:"owner_id"`
 			Size        int    `json:"size"`
 			Thumb       struct {
@@ -84,17 +84,33 @@ type Post struct {
 					URL    string `json:"url"`
 					Width  int    `json:"width"`
 				} `json:"sizes"`
-				Text string `json:"text"`
+				Text   string `json:"text"`
+				UserID int    `json:"user_id"`
 			} `json:"thumb"`
 			Title   string `json:"title"`
 			Updated int    `json:"updated"`
 		} `json:"album"`
 		Link struct {
+			Caption     string `json:"caption"`
 			Description string `json:"description"`
-			IsFavorite  bool   `json:"is_favorite"`
-			Target      string `json:"target"`
-			Title       string `json:"title"`
-			URL         string `json:"url"`
+			Photo       struct {
+				AlbumID int `json:"album_id"`
+				Date    int `json:"date"`
+				ID      int `json:"id"`
+				OwnerID int `json:"owner_id"`
+				Sizes   []struct {
+					Height int    `json:"height"`
+					Type   string `json:"type"`
+					URL    string `json:"url"`
+					Width  int    `json:"width"`
+				} `json:"sizes"`
+				Text   string `json:"text"`
+				UserID int    `json:"user_id"`
+			} `json:"photo"`
+			IsFavorite bool   `json:"is_favorite"`
+			Target     string `json:"target"`
+			Title      string `json:"title"`
+			URL        string `json:"url"`
 		} `json:"link"`
 		Doc struct {
 			AccessKey string     `json:"access_key"`
@@ -128,13 +144,20 @@ type Post struct {
 		} `json:"photo"`
 		Type  string `json:"type"`
 		Video struct {
-			AccessKey   string `json:"access_key"`
-			CanAdd      int    `json:"can_add"`
-			Comments    int    `json:"comments"`
-			Date        int    `json:"date"`
-			Description string `json:"description"`
-			Duration    int    `json:"duration"`
-			FirstFrame  []struct {
+			AccessKey                string `json:"access_key"`
+			CanAdd                   int    `json:"can_add"`
+			CanAddToFaves            int    `json:"can_add_to_faves"`
+			CanComment               int    `json:"can_comment"`
+			CanLike                  int    `json:"can_like"`
+			CanRepost                int    `json:"can_repost"`
+			CanSubscribe             int    `json:"can_subscribe"`
+			Comments                 int    `json:"comments"`
+			ContentRestricted        int    `json:"content_restricted"`
+			ContentRestrictedMessage string `json:"content_restricted_message"`
+			Date                     int    `json:"date"`
+			Description              string `json:"description"`
+			Duration                 int    `json:"duration"`
+			FirstFrame               []struct {
 				Height int    `json:"height"`
 				URL    string `json:"url"`
 				Width  int    `json:"width"`
@@ -148,7 +171,10 @@ type Post struct {
 				WithPadding int    `json:"with_padding"`
 			} `json:"image"`
 			IsFavorite bool   `json:"is_favorite"`
+			LocalViews int    `json:"local_views"`
 			OwnerID    int    `json:"owner_id"`
+			Platform   string `json:"platform"`
+			Repeat     int    `json:"repeat"`
 			Title      string `json:"title"`
 			TrackCode  string `json:"track_code"`
 			Type       string `json:"type"`
@@ -164,13 +190,22 @@ type Post struct {
 	} `json:"comments"`
 	CopyHistory []struct {
 		Attachments []struct {
+			Link struct {
+				Description string `json:"description"`
+				IsFavorite  bool   `json:"is_favorite"`
+				Target      string `json:"target"`
+				Title       string `json:"title"`
+				URL         string `json:"url"`
+			} `json:"link"`
 			Photo struct {
-				AccessKey string `json:"access_key"`
-				AlbumID   int    `json:"album_id"`
-				Date      int    `json:"date"`
-				ID        int    `json:"id"`
-				OwnerID   int    `json:"owner_id"`
-				PostID    int    `json:"post_id"`
+				AccessKey string  `json:"access_key"`
+				AlbumID   int     `json:"album_id"`
+				Date      int     `json:"date"`
+				ID        int     `json:"id"`
+				Lat       float64 `json:"lat"`
+				Long      float64 `json:"long"`
+				OwnerID   int     `json:"owner_id"`
+				PostID    int     `json:"post_id"`
 				Sizes     []struct {
 					Height int    `json:"height"`
 					Type   string `json:"type"`
@@ -180,7 +215,36 @@ type Post struct {
 				Text   string `json:"text"`
 				UserID int    `json:"user_id"`
 			} `json:"photo"`
-			Type string `json:"type"`
+			Type  string `json:"type"`
+			Video struct {
+				AccessKey                string `json:"access_key"`
+				CanAdd                   int    `json:"can_add"`
+				CanAddToFaves            int    `json:"can_add_to_faves"`
+				CanComment               int    `json:"can_comment"`
+				CanLike                  int    `json:"can_like"`
+				CanRepost                int    `json:"can_repost"`
+				CanSubscribe             int    `json:"can_subscribe"`
+				Comments                 int    `json:"comments"`
+				ContentRestricted        int    `json:"content_restricted"`
+				ContentRestrictedMessage string `json:"content_restricted_message"`
+				Date                     int    `json:"date"`
+				Duration                 int    `json:"duration"`
+				Height                   int    `json:"height"`
+				ID                       int    `json:"id"`
+				Image                    []struct {
+					Height      int    `json:"height"`
+					URL         string `json:"url"`
+					Width       int    `json:"width"`
+					WithPadding int    `json:"with_padding"`
+				} `json:"image"`
+				IsFavorite bool   `json:"is_favorite"`
+				OwnerID    int    `json:"owner_id"`
+				Title      string `json:"title"`
+				TrackCode  string `json:"track_code"`
+				Type       string `json:"type"`
+				Views      int    `json:"views"`
+				Width      int    `json:"width"`
+			} `json:"video"`
 		} `json:"attachments"`
 		Date       int `json:"date"`
 		FromID     int `json:"from_id"`
@@ -199,12 +263,13 @@ type Post struct {
 		Name string `json:"name"`
 		Type string `json:"type"`
 	} `json:"copyright"`
-	Date       int  `json:"date"`
-	Edited     int  `json:"edited"`
-	FromID     int  `json:"from_id"`
-	ID         int  `json:"id"`
-	IsFavorite bool `json:"is_favorite"`
-	IsPinned   int  `json:"is_pinned"`
+	Date       int    `json:"date"`
+	Edited     int    `json:"edited"`
+	FromID     int    `json:"from_id"`
+	Hash       string `json:"hash"`
+	ID         int    `json:"id"`
+	IsFavorite bool   `json:"is_favorite"`
+	IsPinned   int    `json:"is_pinned"`
 	Likes      struct {
 		CanLike    int `json:"can_like"`
 		CanPublish int `json:"can_publish"`
